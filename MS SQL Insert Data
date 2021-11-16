@@ -1,0 +1,96 @@
+
+CREATE PROCEDURE sptblMemberAddData
+	@memTypeID INT,
+	@title NVARCHAR (5),
+	@firstName NVARCHAR (30),
+	@surname NVARCHAR (30),
+	@dob DATE,
+	@email NVARCHAR (80), 
+	@passwordHAsh NVARCHAR(50), 
+	@dayJoined DATE,
+	@readingList BIT, 
+	@amountOfStamps INT
+
+AS 
+
+DECLARE @passwordSalt uniqueidentifier = NEWID()
+
+        INSERT INTO  tblMember (memTypeID, title, firstName, surname, dob, email, passwordHash, passwordSalt, dayJoined, readingList, amountOfStamps) VALUES
+		(@memTypeID, @title, @firstName, @surname, @dob, @email, HASHBYTES('SHA2_512', @passwordHAsh+CAST(@passwordSalt AS NVARCHAR(36))), @passwordSalt, @dayJoined, @readingList, @amountOfStamps)
+GO;
+
+EXEC sptblMemberAddData
+	@memTypeID = '1',
+	@title  = 'Mr',
+	@firstName  = 'Otis',
+	@surname  = 'Redding',
+	@dob  = '1979-11-02',
+	@email  = 'ORedding1979@email.com',
+	@passwordHAsh  = 'Tenderness',
+	@dayJoined  = '2021-04-22',
+	@readingList  = '0',
+	@amountOfStamps  = '17'
+
+INSERT INTO tblNonFicBook (title, authorFirstname, authorSurname, pageCount, publishDate, synopsis, price, edition, topic) VALUES
+	('HTML and CSS: Design and Build Websites', 'Jon', 'Duckett', '512', '2011-11-18', 'A full-color introduction to the basics of HTML and CSS from the publishers of Wrox', '22.99', '3', 'Computing'),
+	('Cats from the Scandinavian Woods: A Study of Norwegian Forest Cats ', 'Mary-Rose', 'Douglas', '72', '1999-12-01', DEFAULT, '6.99', '1', 'Science'),
+	('Brothers in Arms: A Legendary Tank Regiments Bloody War from D-Day to VE Day', 'James', 'Holland', '400', '2021-09-30', 'From the bestselling author of Normandy 44 and Sicily 43 comes the untold story of the Sherwood Rangers', '21.99', '1', 'History'),
+	('The Transgender Issue: An Argument for Justice', 'Shon', 'Faye', '320', '2021-09-02', 'Taking a wide-ranging and multi-layered look at what it means to be transgender in modern Britain', '17.99', '1', 'Politics'),
+	('How to Tell If Your Cat Is Plotting to Kill You', 'Matthew', 'Inman', '136', '2012-10-11', 'A very funny, creative selection of comics, facts, and instructional guides,', '9.99', '1', 'Humour'),
+	('Cracking the Coding Interview', 'Gayle', 'McDowell', '708', '2015-07-01', DEFAULT, '35.95', '6', 'Computing'),
+	('The Dawn of Everything: A New History of Humanity ', 'David', 'Graeber', '704', '2021-10-19', 'Radically overturns the enlightenment project, recasting our distant ancestors as socially and emotionally complex', '26.99', '1', 'History');
+
+
+INSERT INTO tblFicBook (title, authorFirstname, authorSurname, pageCount, publishDate, synopsis, price, genre) VALUES 
+	('Norwegian Wood', 'Haruki', 'Murakami', '400', '2001-05-17', 'When he hears her favourite Beatles song, Toru Watanabe recalls his first love Naoko, the girlfriend of his best friend Kizuki', '8.99', 'Romance'),
+	('Jane Eyre', 'Charlotte', 'Bronte', '624', '1847-10-16', 'Orphaned into the household of her Aunt Reed at Gateshead, subject to the cruel regime at Lowood charity school, Jane Eyre nonetheless emerges unbroken in spirit and integrity', '14.99', 'Classic'),
+	('Leave the World Behind', 'Rumaan', 'Alam', '256', '2021-06-01', 'A magnetic novel about two families, strangers to each other, who are forced together on a long weekend gone terribly wrong', '8.99', 'Crime'),
+	('The Haunting of Hill House', 'Shirley', 'Jackson', '256', '1959-10-01', 'Four seekers have arrived at the rambling old pile known as Hill House: Dr. Montague, an occult scholar looking for solid evidence of psychic phenomena; Theodora, his lovely assistant; Luke, the future inheritor of the estate; and Eleanor, a friendless, fragile young woman with a dark past.', '9.99', 'Horror'),
+	('The Lord of the Rings', 'J. R. R.', 'Tolkien', '1248', '1954-07-29', DEFAULT, '60.00', 'Fantasy'),
+	('Frankenstein', 'Mary', 'Shelly', '132', '1818-01-01', 'Victor Frankenstein was able to do something impossible to other scientists. He created an (human) being', '4.69', 'Horror'),
+	('Brave New World', 'Aldous', 'Huxley', '288', '2014-11-06', 'Far in the future, the World Controllers have created the ideal society', '9.99', 'Classic');
+
+
+
+INSERT INTO tblStore (streetAddress, city, postcode, openTime, closeTime, cafe, disableAccess, toilets, wifi, telephone) VALUES 
+	('Edinburgh West End', 'Edinburgh','EH2 4AD','09:00:00','20:00:00','1','1','0','1','01312262666'),
+	('Glasgow Argyle Street', 'Glasgow','G2 8BT',DEFAULT,DEFAULT,'1','0','1','1','0141248 4814'),
+	('London Trafalgar Square', 'London','WC2N 5EJ','09:00:00','20:00:00','1','0','1','1','02078394411'),
+	('London Camden', 'London','NW1 0LU','09:00:00','20:00:00','1','1','0','1','0207284 4948'),
+	('Grimsby', 'Grimsby','DN31 1QL','09:00:00','17:30:00','0','0','0','1','01472353212'),
+	('Cambridge', 'Cambridge','CB2 3HG','09:00:00','20:00:00','1','0','1','1','01223351688');
+
+INSERT INTO tblEvents (storeID, nonFicBookID, ficBookID, eventName, eventDate, host, ticketPrice, ticketAvailable) VALUES 
+	('4', NULL, '3', 'Meet Rumaan Alam!', '2021-12-20', 'Camden', '10.00', '100'),
+	('1', NULL, '3', 'Meet Rumaan Alam!', '2022-01-07', 'Edinburgh West End', '10.00', '120'),
+	('2', '7', NULL, 'Talk About the History of Humanity!', '2022-04-20', 'Argyle Street', '5.00', '50'),
+	('2', '7', NULL, 'Talk About the History of Humanity Again!', '2022-04-21', 'Argyle Street', '5.00', '50'),
+	('3', '5', NULL, 'Webcomics and Comedy', '2022-02-15', 'Trafalgar Square', '0.00', '60'),
+	('6', '4', NULL, 'Gender Issues with Shon Faye', '2022-01-20', 'Cambridge', '0.00', '100'),
+	('2', NULL, '5', 'Talking the Fantasy Classic for ONE DAY ONLY!', '2021-12-25', 'Argyle Street', '100.00', '200'),
+	('5', '3', NULL, 'WW2 History', '2022-03-12', 'Grimsby', '07.99', '45'),
+	('4', '4', NULL, 'Understanding Sexuality', '2022-02-10', 'Camden', '3.00', '50'),
+	('1', NULL, '6', 'MEET THE ORGINAL MONSTOR', '2022-01-01', 'Edinburgh West End', '6.66', '100'),
+	('3', NULL, '4', 'Hill House: Meet the cast', '2022-05-01', 'Trafalgar Square', '14.99', '150'),
+	('1', '6', NULL, 'Get the Job!', '2021-12-15', 'Edinburgh West End', '19.99', '25'),
+	('6', '1', NULL, 'Web Design 101', '2022-06-30', 'Cambridge', '8.99', '20'),
+	('6', '1', NULL, 'Web Design 101', '2022-07-01', 'Cambridge', '8.99', '20'),
+	('1', NULL, '2', 'Discussion on Jane Eyre', '2022-05-23', 'Argyle Street', '8.99', '30');
+
+INSERT INTO tblOrder(nonFicBookID, ficBookID, memberID, storeID, discount, total, orderDate) VALUES 
+	(NUll, '1', '1', '2', '0.90', '8.09', '2021-11-11'),
+	(NUll, '5', '5', '1', '6.00', '54.00', '2021-12-20'),
+	('6', NULL, '4', '6', DEFAULT, '35.95', '2015-04-17'),
+	('7', NULL, '5', '3', '2.69', '24.30', '2021-01-08'),
+	('1', '6', '2', '5', '2.77', '24.91', '2016-05-21'),
+	(NUll, '1', '5', '2', '0.90', '8.09', '2021-10-31'),
+	('3', NULL, '6', '4', '1.09', '20.9', '2018-03-12'), 
+	('6', '5', '6', '1', '3.00', '92.95', '2021-01-11'), 
+	(NUll, '2', '3', '5', '0.75', '14.24', '2021-08-20'), 
+	('5', NULL, '4', '4', '0.99', '9.00', '2019-04-10'),
+	(NUll, '3', '6', '2', '0.45', '8.54', '2020-06-24'),
+	('2', '4', '2', '6', '1.69', '15.29', '2017-02-02'),
+	('4', NULL, '4', '1', '1.79', '16.20', '2021-08-20'), 
+	(NUll, '7', '3', '2', '0.45', '9.54', '2021-08-20'),
+	(NUll, '1', '2', '3', '0.90', '8.09', '2019-02-04'),
+	('6', NULL, '5', '5', DEFAULT, '35.95', '2021-09-07');
