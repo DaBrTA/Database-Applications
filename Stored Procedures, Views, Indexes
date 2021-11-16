@@ -1,0 +1,44 @@
+CREATE NONCLUSTERED INDEX indxMemSurname on tblMember (surname);
+CREATE NONCLUSTERED INDEX indxStoreCity on tblStore (city);
+
+GO;
+
+CREATE VIEW vwEventAvailability
+AS SELECT eventID, host, eventDate, ticketPrice, ticketAvailable FROM waterstones.dbo.tblEvents;
+
+GO;
+
+CREATE VIEW vwAllBooks AS
+SELECT title, authorFirstname, authorSurname, pageCount, synopsis, price FROM tblNonFicBook AS A
+UNION ALL SELECT title, authorFirstname, authorSurname, pageCount, synopsis, price FROM tblFicBook AS B
+
+GO;
+
+CREATE TRIGGER spDeleteOrder 
+ON tblOrder 
+INSTEAD OF DELETE AS
+THROW 51000, 'Orders can not be deleted', 1;
+
+DELETE FROM tblOrder 
+WHERE orderDate = '2015-04-17'
+
+GO;
+
+SELECT odr.orderID, mem.firstName, mem.surname,  odr.orderDate, odr.collectionDate, concat(nfic.title, fic.title) as title, odr.total FROM tblMember AS mem 
+INNER JOIN tblOrder AS odr ON
+mem.memberID = odr.memberID 
+FULL OUTER JOIN tblNonFicBook AS nfic ON
+nfic.nonFicBookID = odr.nonFicBookID
+FULL OUTER JOIN tblFicBook AS fic ON
+fic.ficBookID = odr.ficBookID
+WHERE odr.orderDate >= '2019-01-01'
+ORDER BY odr.orderDate;
+ 
+GO;
+
+
+SELECT city, sum(ticketAvailable) AS ticketsPerCity, concat('£', sum(ticketAvailable*ticketPrice)) AS maxMoneyRaised FROM tblStore AS store 
+INNER JOIN tblEvents AS evnt ON
+store.storeID = evnt.storeID
+GROUP BY city
+ORDER BY sum(ticketAvailable*ticketPrice)
